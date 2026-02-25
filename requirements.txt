@@ -36,5 +36,3 @@ python-jose==3.3.0
 passlib==1.7.4
 bcrypt==4.1.2
 redis==5.0.1
-Install everything:
-bashpip install -r requirements.txt
