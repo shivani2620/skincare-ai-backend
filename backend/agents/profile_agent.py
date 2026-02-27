@@ -38,7 +38,7 @@ Extract structured information and return ONLY valid JSON (no markdown, no backt
 
         try:
             message = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-3-haiku-20240307",
                 max_tokens=1500,
                 temperature=0.3,
                 system=system_prompt,
@@ -86,7 +86,7 @@ Return ONLY a JSON array of strings:
 
         try:
             message = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-3-haiku-20240307",
                 max_tokens=500,
                 temperature=0.7,
                 system=system_prompt,

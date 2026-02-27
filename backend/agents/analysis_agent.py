@@ -36,7 +36,7 @@ Return ONLY valid JSON with this structure:
 
         try:
             message = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-3-haiku-20240307",
                 max_tokens=2500,
                 temperature=0.2,
                 system=system_prompt,
@@ -135,7 +135,7 @@ If none, return empty array: []
 
         try:
             message = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-3-haiku-20240307",
                 max_tokens=500,
                 temperature=0.1,
                 system=system_prompt,

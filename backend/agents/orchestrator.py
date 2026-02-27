@@ -61,7 +61,7 @@ Return ONLY valid JSON:
             )
 
             message = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-3-haiku-20240307",
                 max_tokens=500,
                 temperature=0.1,
                 system=system_prompt,
@@ -180,7 +180,7 @@ Keep responses concise (2-3 short paragraphs).
 
         try:
             response = self.client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-3-haiku-20240307",
                 max_tokens=500,
                 temperature=0.7,
                 system=system_prompt,

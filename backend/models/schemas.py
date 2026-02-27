@@ -3,7 +3,6 @@ from typing import List, Optional, Dict
 from datetime import datetime
 from enum import Enum
 
-
 # =========================
 # ENUMS
 # =========================
@@ -15,13 +14,11 @@ class SkinType(str, Enum):
     sensitive = "sensitive"
     normal = "normal"
 
-
 class Climate(str, Enum):
     tropical = "tropical"
     dry = "dry"
     cold = "cold"
     temperate = "temperate"
-
 
 # =========================
 # USER MODELS
@@ -38,14 +35,14 @@ class UserProfile(BaseModel):
     climate: Climate
     lifestyle: Optional[Dict] = None
     medical_conditions: List[str] = Field(default_factory=list)
+    work_location: Optional[str] = None  # ✅ New field
     created_at: datetime = Field(default_factory=datetime.utcnow)
-
 
 class UserProfileCreate(BaseModel):
     name: str
     age: int = Field(..., ge=10, le=100)
     description: str
-
+    work_location: Optional[str] = None  # ✅ Allow frontend to send work location
 
 # =========================
 # PRODUCT MODELS
@@ -62,11 +59,9 @@ class Product(BaseModel):
     price: Optional[float] = None
     image_url: Optional[str] = None
 
-
 class ProductScan(BaseModel):
     user_id: str
     barcode: str
-
 
 # =========================
 # ANALYSIS MODELS
@@ -80,7 +75,6 @@ class IngredientAnalysis(BaseModel):
     evidence_level: str
     explanation: str
 
-
 class ProductAnalysisResult(BaseModel):
     product: Product
     overall_score: int = Field(..., ge=0, le=100)
@@ -92,7 +86,6 @@ class ProductAnalysisResult(BaseModel):
     alternatives: List[Dict] = Field(default_factory=list)
     breakout_risk: float = Field(..., ge=0, le=100)
 
-
 # =========================
 # CHAT MODELS
 # =========================
@@ -101,13 +94,11 @@ class ChatMessage(BaseModel):
     user_id: str
     message: str
 
-
 class ChatResponse(BaseModel):
     response: str
     agent_used: str
     confidence: float = Field(..., ge=0, le=1)
     follow_up_questions: Optional[List[str]] = None
-
 
 # =========================
 # FEEDBACK MODELS

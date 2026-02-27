@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, Integer, Float, JSON, DateTime, Text
 from sqlalchemy.sql import func
 from .connection import Base
 
+# ===================== USER MODEL =====================
 class User(Base):
     __tablename__ = "users"
     
@@ -15,9 +16,11 @@ class User(Base):
     climate = Column(String)
     lifestyle = Column(JSON, nullable=True)
     medical_conditions = Column(JSON)
+    work_location = Column(String, nullable=True)  # ✅ New column for work location
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
+# ===================== PRODUCT MODEL =====================
 class ProductDB(Base):
     __tablename__ = "products"
     
@@ -32,6 +35,7 @@ class ProductDB(Base):
     image_url = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+# ===================== FEEDBACK MODEL =====================
 class FeedbackDB(Base):
     __tablename__ = "feedback"
     
@@ -43,6 +47,7 @@ class FeedbackDB(Base):
     notes = Column(Text, nullable=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
 
+# ===================== CONVERSATION HISTORY =====================
 class ConversationHistory(Base):
     __tablename__ = "conversations"
     
@@ -52,3 +57,15 @@ class ConversationHistory(Base):
     message = Column(Text)
     agent_used = Column(String, nullable=True)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
+
+# ===================== SKIN PROGRESS =====================
+class SkinProgress(Base):
+    __tablename__ = "skin_progress"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, index=True)
+    date = Column(DateTime(timezone=True), server_default=func.now())
+    photo_url = Column(String, nullable=True)
+    notes = Column(Text, nullable=True)
+    skin_score = Column(Integer)  # 0-100
+    concerns_severity = Column(JSON)  # {"acne": "moderate", "redness": "mild"}
