@@ -1,12 +1,11 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 from datetime import datetime
 import pandas as pd
 import uuid
+import os
 
 # Load environment variables
 load_dotenv()
@@ -29,8 +28,23 @@ app = FastAPI(
 
 # ---------------- LOAD DATASET ----------------
 try:
-    products_df = pd.read_csv("skincare_products.csv")
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    DATA_PATH = os.path.join(BASE_DIR, "skincare_products_50000_rows.csv")
+
+    products_df = pd.read_csv(DATA_PATH)
+
+    # Ensure important columns exist
+    required_columns = ["product_name", "skin_type", "category", "barcode", "key_ingredients"]
+    for col in required_columns:
+        if col not in products_df.columns:
+            raise Exception(f"Missing column: {col}")
+
+    # Clean data
+    products_df["skin_type"] = products_df["skin_type"].astype(str)
+    products_df["barcode"] = products_df["barcode"].astype(str)
+
     print("✅ Skincare dataset loaded successfully")
+
 except Exception as e:
     print("❌ Failed to load dataset:", e)
     products_df = None
@@ -47,11 +61,18 @@ app.add_middleware(
 # ================= ROOT =================
 @app.get("/")
 def root():
-    return {"message": "🌸 Skincare Intelligence API", "status": "running", "version": "3.0.0"}
+    return {
+        "message": "🌸 Skincare Intelligence API",
+        "status": "running",
+        "version": "3.0.0"
+    }
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
+    return {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat()
+    }
 
 # ================= CREATE USER =================
 @app.post("/api/users/create-from-description")
@@ -131,7 +152,9 @@ async def scan_product(scan: ProductScan):
     if products_df is None:
         raise HTTPException(status_code=500, detail="Dataset not loaded")
 
-    product = products_df[products_df["barcode"] == str(scan.barcode)]
+    barcode_value = str(scan.barcode)
+
+    product = products_df[products_df["barcode"] == barcode_value]
 
     if product.empty:
         raise HTTPException(status_code=404, detail="Product not found")
@@ -150,6 +173,9 @@ async def scan_product(scan: ProductScan):
 @app.post("/api/routine/generate")
 async def generate_routine(user_id: str, db: Session = Depends(get_db)):
 
+    if products_df is None:
+        raise HTTPException(status_code=500, detail="Dataset not loaded")
+
     user = db.query(User).filter(User.user_id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -161,14 +187,18 @@ async def generate_routine(user_id: str, db: Session = Depends(get_db)):
         (products_df["skin_type"].str.lower() == "all")
     ]
 
-    morning = routine_products[routine_products["category"] == "Cleanser"]["product_name"].head(1).tolist() + \
-              routine_products[routine_products["category"] == "Serum"]["product_name"].head(1).tolist() + \
-              routine_products[routine_products["category"] == "Moisturizer"]["product_name"].head(1).tolist() + \
-              routine_products[routine_products["category"] == "Sunscreen"]["product_name"].head(1).tolist()
+    morning = (
+        routine_products[routine_products["category"] == "Cleanser"]["product_name"].head(1).tolist() +
+        routine_products[routine_products["category"] == "Serum"]["product_name"].head(1).tolist() +
+        routine_products[routine_products["category"] == "Moisturizer"]["product_name"].head(1).tolist() +
+        routine_products[routine_products["category"] == "Sunscreen"]["product_name"].head(1).tolist()
+    )
 
-    night = routine_products[routine_products["category"] == "Cleanser"]["product_name"].head(1).tolist() + \
-            routine_products[routine_products["category"] == "Treatment"]["product_name"].head(1).tolist() + \
-            routine_products[routine_products["category"] == "Moisturizer"]["product_name"].head(1).tolist()
+    night = (
+        routine_products[routine_products["category"] == "Cleanser"]["product_name"].head(1).tolist() +
+        routine_products[routine_products["category"] == "Treatment"]["product_name"].head(1).tolist() +
+        routine_products[routine_products["category"] == "Moisturizer"]["product_name"].head(1).tolist()
+    )
 
     return {
         "skin_type": skin_type,
