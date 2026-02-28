@@ -12,17 +12,18 @@ import {
 } from 'react-native';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000'; // Change this for production
+const API_URL = process.env.EXPO_PUBLIC_API_URL; // Change this for production
 
 export default function ProfileSetupScreen({ navigation, setUserId }) {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
+  const [workLocation, setWorkLocation] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const createProfile = async () => {
-    if (!name || !age || !description) {
+    if (!name || !age || !workLocation || !description) {
       setError('Please fill in all fields');
       return;
     }
@@ -34,10 +35,14 @@ export default function ProfileSetupScreen({ navigation, setUserId }) {
       const response = await axios.post(`${API_URL}/api/users/create-from-description`, {
         name,
         age: parseInt(age),
+        work_location: workLocation,
         description,
       });
 
       setUserId(response.data.user_id);
+      navigation.navigate("Profile", {
+  userId: response.data.user_id,
+});
       
       // Navigate to main app
       navigation.navigate('Main');
@@ -72,6 +77,13 @@ export default function ProfileSetupScreen({ navigation, setUserId }) {
           value={age}
           onChangeText={setAge}
           keyboardType="numeric"
+        />
+
+        <TextInput
+         style={styles.input}
+         placeholder="Work Location"
+         value={workLocation}
+         onChangeText={setWorkLocation}
         />
 
         <TextInput

@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "620c3646-e22c-4a8d-baac-26043912df2f"
+      }
+    },
+    "android": {
+      "package": "com.shivakaminie.frontend"
+    },
+    "ios": {
+      "bundleIdentifier": "com.shivakaminie.frontend",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
